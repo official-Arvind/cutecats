@@ -86,80 +86,132 @@ startBtn.addEventListener('click', function() {
     }
 });
 
-const lyricsData = [
-    { time: 1000, text: "😎 Hello Good Morning Kaise Hai Aap Sab" },
-    { time: 4000, text: "🎙️ Aaj Humare Saath Maujood Hai..." },
-    { time: 7000, text: "🔥 Humare Podcast Pe Mr Bali Ji!" },
-    { time: 10000, text: "🤔 Apne Baare Mei Kuch Bataiye Zara" },
-    { time: 13000, text: "🗣️ Mera Poora Naam Sachin Surname Bali Hai" },
-    { time: 16000, text: "🥛 Doodh Nahi Pe Sakta Mai..." },
-    { time: 18500, text: "💩 Potty Lag Jaati Hai" },
-    { time: 21500, text: "👨‍🦲 Maathe Pe V Bana Ganja Hun" },
-    { time: 25000, text: "⁉️ Sawal Ek, Theek Hai Chaar Jawab" },
-    { time: 28000, text: "🚀 Next Level Chalti Hai Vartalaap!" },
-    { time: 31000, text: "🎤 Welcome To My Podcast." },
-    { time: 34000, text: "👂 Abe Bol Rahe Ho Na Kya Tera Kaan Kharab!" }
-];
+let lyricsData = [];
 
+// Advanced Sync Engine: Polls the YouTube API internal clock directly
+function checkLyricsSync() {
+    if (ytPlayer && typeof ytPlayer.getCurrentTime === 'function' && lyricsData.length > 0) {
+        const timeMs = ytPlayer.getCurrentTime() * 1000;
+        
+        let foundIndex = -1;
+        for (let i = 0; i < lyricsData.length; i++) {
+            if (timeMs >= lyricsData[i].time) {
+                foundIndex = i;
+            } else {
+                break;
+            }
+        }
+        
+        // Loop functionality: If time passes the end, we don't do anything because the song keeps playing.
+        if (foundIndex !== -1 && foundIndex !== currentLyricIndex) {
+            currentLyricIndex = foundIndex;
+            
+            const lyricsContainer = document.getElementById('lyrics-container');
+            const lyricsEl = document.getElementById('lyrics');
+            
+            // Foolproof CSS animation restart
+            lyricsEl.style.animation = 'none';
+            lyricsEl.offsetHeight; // trigger reflow
+            lyricsEl.style.animation = null;
+            
+            // Update text
+            lyricsEl.innerText = lyricsData[foundIndex].text;
+            
+            // Toggle position left/right
+            if (lyricsContainer.className.includes('lyric-pos-left')) {
+                lyricsContainer.className = 'lyric-pos-right';
+            } else {
+                lyricsContainer.className = 'lyric-pos-left';
+            }
 
+            // Funky Color switch
+            const colors = ['#fffb00', '#00ffff', '#ff00ff', '#ffffff', '#ff9900', '#00ffcc'];
+            lyricsEl.style.color = colors[Math.floor(Math.random() * colors.length)];
+            
+            // Trigger pop animation
+            lyricsEl.classList.add('lyric-animate');
+        }
+    }
+    lyricsInterval = requestAnimationFrame(checkLyricsSync);
+}
+
+// Function to fetch and parse external lyrics from API
+async function fetchLyricsAPI() {
+    try {
+        const response = await fetch('https://lrclib.net/api/search?q=Podcast+Bali', {
+            headers: { 'User-Agent': 'BaliCats WebPlayer' }
+        });
+        const data = await response.json();
+        let foundSynced = false;
+        
+        if (data && data.length > 0) {
+            for (let track of data) {
+                if (track.syncedLyrics) {
+                    parseLRC(track.syncedLyrics);
+                    foundSynced = true;
+                    console.log("Successfully fetched synced lyrics from API!");
+                    break;
+                }
+            }
+        }
+        
+        if (!foundSynced) {
+            console.log("No synced lyrics on API, using local fallback.");
+            useFallbackLyrics();
+        }
+    } catch (e) {
+        console.error("API Lyrics fetch failed:", e);
+        useFallbackLyrics();
+    }
+}
+
+function parseLRC(lrcText) {
+    const lines = lrcText.split('\n');
+    lyricsData = [];
+    lines.forEach(line => {
+        // match [mm:ss.xx] text
+        const match = line.match(/\[(\d+):(\d+\.\d+)\](.*)/);
+        if (match) {
+            const minutes = parseInt(match[1]);
+            const seconds = parseFloat(match[2]);
+            const text = match[3].trim();
+            if (text) {
+                lyricsData.push({
+                    time: (minutes * 60 + seconds) * 1000,
+                    text: text
+                });
+            }
+        }
+    });
+}
+
+function useFallbackLyrics() {
+    lyricsData = [
+        { time: 1000, text: "😎 Hello Good Morning Kaise Hai Aap Sab" },
+        { time: 4000, text: "🎙️ Aaj Humare Saath Maujood Hai..." },
+        { time: 7000, text: "🔥 Humare Podcast Pe Mr Bali Ji!" },
+        { time: 10000, text: "🤔 Apne Baare Mei Kuch Bataiye Zara" },
+        { time: 13000, text: "🗣️ Mera Poora Naam Sachin Surname Bali Hai" },
+        { time: 16000, text: "🥛 Doodh Nahi Pe Sakta Mai..." },
+        { time: 18500, text: "💩 Potty Lag Jaati Hai" },
+        { time: 21500, text: "👨‍🦲 Maathe Pe V Bana Ganja Hun" },
+        { time: 25000, text: "⁉️ Sawal Ek, Theek Hai Chaar Jawab" },
+        { time: 28000, text: "🚀 Next Level Chalti Hai Vartalaap!" },
+        { time: 31000, text: "🎤 Welcome To My Podcast." },
+        { time: 34000, text: "👂 Abe Bol Rahe Ho Na Kya Tera Kaan Kharab!" }
+    ];
+}
 
 function startLyrics() {
     if (lyricsInterval !== null) {
         return; // already started
     }
 
-    const lyricsContainer = document.getElementById('lyrics-container');
-    const lyricsEl = document.getElementById('lyrics');
-    let isLeft = true;
-
-    // Advanced Sync Engine: Polls the YouTube API internal clock directly
-    // This provides "Metrolist" / Spotify level perfect syncing even if buffering
-    function checkLyricsSync() {
-        if (ytPlayer && typeof ytPlayer.getCurrentTime === 'function') {
-            const timeMs = ytPlayer.getCurrentTime() * 1000;
-            
-            let foundIndex = -1;
-            for (let i = 0; i < lyricsData.length; i++) {
-                if (timeMs >= lyricsData[i].time) {
-                    foundIndex = i;
-                } else {
-                    break;
-                }
-            }
-            
-            // Loop functionality: If time passes the end, we don't do anything because the song keeps playing.
-            if (foundIndex !== -1 && foundIndex !== currentLyricIndex) {
-                currentLyricIndex = foundIndex;
-                
-                // Foolproof CSS animation restart
-                lyricsEl.style.animation = 'none';
-                lyricsEl.offsetHeight; // trigger reflow
-                lyricsEl.style.animation = null;
-                
-                // Update text
-                lyricsEl.innerText = lyricsData[foundIndex].text;
-                
-                // Toggle position left/right
-                if (isLeft) {
-                    lyricsContainer.className = 'lyric-pos-left';
-                } else {
-                    lyricsContainer.className = 'lyric-pos-right';
-                }
-                isLeft = !isLeft;
-
-                // Funky Color switch
-                const colors = ['#fffb00', '#00ffff', '#ff00ff', '#ffffff', '#ff9900', '#00ffcc'];
-                lyricsEl.style.color = colors[Math.floor(Math.random() * colors.length)];
-                
-                // Trigger pop animation
-                lyricsEl.classList.add('lyric-animate');
-            }
-        }
-        lyricsInterval = requestAnimationFrame(checkLyricsSync);
-    }
-
-    // Start the sync engine
-    checkLyricsSync();
+    // Attempt to fetch full lyrics dynamically before starting the sync engine!
+    fetchLyricsAPI().then(() => {
+        // Start the sync engine on the lyrics datastore
+        checkLyricsSync();
+    });
 }
 
 function startCats() {
