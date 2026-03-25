@@ -3,37 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Podcast from Bali 🌴😺</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+    <title>Podcast from Bali 🌴</title>
+    <!-- Funky pixel font -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Fredoka+One&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <!-- Load YouTube Iframe API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body>
     <div id="start-screen">
         <h1>🌴 Podcast from Bali 🌴</h1>
-        <p>Turn on your sound & get ready to groove!</p>
-        <button id="start-btn">Tap to Play! 😺</button>
+        <p>Turn on volume & wait for the vibe!</p>
+        <button id="start-btn">Let's Go! 😺</button>
     </div>
 
-    <!-- Hidden audio element for the music -->
-    <!-- You can replace the src with your actual "podcast-from-bali.mp3" file if you have one! -->
-    <audio id="bg-music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-16.mp3" loop></audio>
+    <!-- Hidden YouTube Player -->
+    <div id="player-container">
+        <div id="youtube-player"></div>
+    </div>
 
     <div id="main-content" class="hidden">
         <div id="lyrics-container">
-            <h2 id="lyrics">🎵 Welcome to the vibe! 🎵</h2>
+            <h2 id="lyrics">🎵 Let the vibe begin... 🎵</h2>
         </div>
         
-        <!-- Cat Elements -->
-        <div class="cat cat-1">🐱</div>
-        <div class="cat cat-2">😸</div>
-        <div class="cat cat-3">😹</div>
-        <div class="cat cat-4">😻</div>
-        <div class="cat cat-5">😼</div>
-        <div class="cat cat-6">😽</div>
-        <div class="cat cat-7">🙀</div>
-        <div class="cat cat-8">😿</div>
-        <div class="cat cat-9">😾</div>
-        <div class="cat cat-10">🐈</div>
+        <!-- Animated 3D/Pixel Cat Gifs -->
+        <!-- Pop cat / Vibing cats -->
+        <img class="cat cat-1" src="https://media.tenor.com/_HhVzB1wNtkAAAAi/cat-vibing.gif" alt="cat">
+        <img class="cat cat-2" src="https://media.tenor.com/a4q1iK-B6H0AAAAi/pixel-cat.gif" alt="cat">
+        <img class="cat cat-3" src="https://media.tenor.com/Z-zaUARkQAMAAAAd/cat-maxwell.gif" alt="cat">
+        <img class="cat cat-4" src="https://media.tenor.com/0vKzFhHl37UAAAAi/bongo-cat.gif" alt="cat">
+        <img class="cat cat-5" src="https://media.tenor.com/a4q1iK-B6H0AAAAi/pixel-cat.gif" alt="cat">
+        <img class="cat cat-6" src="https://media.tenor.com/_HhVzB1wNtkAAAAi/cat-vibing.gif" alt="cat">
+        <img class="cat cat-7" src="https://media.tenor.com/Z-zaUARkQAMAAAAd/cat-maxwell.gif" alt="cat">
     </div>
 
     <script src="script.js"></script>

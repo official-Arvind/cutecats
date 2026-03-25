@@ -6,9 +6,9 @@
 }
 
 body {
-    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background: linear-gradient(-45deg, #1a1a2e, #16213e, #0f3460, #e94560);
     background-size: 400% 400%;
-    animation: gradientBG 15s ease infinite;
+    animation: gradientBG 10s ease infinite;
     height: 100vh;
     overflow: hidden;
     color: white;
@@ -29,15 +29,17 @@ body {
     justify-content: center;
     align-items: center;
     z-index: 100;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(10px);
 }
 
 #start-screen h1 {
-    font-size: 4rem;
-    margin-bottom: 20px;
-    text-shadow: 0 4px 15px rgba(255, 105, 180, 0.8);
-    animation: bounceText 2s infinite alternate;
+    font-size: 3rem;
+    font-family: 'Press Start 2P', cursive;
+    margin-bottom: 30px;
+    line-height: 1.5;
+    text-shadow: 4px 4px 0px rgba(255, 105, 180, 0.8);
+    animation: bounceText 1s infinite alternate;
 }
 
 #start-screen p {
@@ -48,18 +50,19 @@ body {
 #start-btn {
     padding: 15px 40px;
     font-size: 2rem;
-    background: #ff69b4;
+    font-family: 'Press Start 2P', cursive;
+    background: #FF00FF;
     color: white;
-    border: none;
-    border-radius: 50px;
+    border: 4px solid #00FFFF;
+    border-radius: 10px;
     cursor: pointer;
-    box-shadow: 0 10px 25px rgba(255, 105, 180, 0.5);
-    transition: transform 0.3s, background 0.3s;
+    box-shadow: 8px 8px 0px #00FFFF;
+    transition: transform 0.1s, box-shadow 0.1s;
 }
 
-#start-btn:hover {
-    transform: scale(1.1);
-    background: #ff1493;
+#start-btn:active {
+    transform: translate(4px, 4px);
+    box-shadow: 4px 4px 0px #00FFFF;
 }
 
 .hidden {
@@ -72,70 +75,89 @@ body {
     height: 100vh;
 }
 
+#player-container {
+    position: absolute;
+    top: -9999px; left: -9999px;
+}
+
 #lyrics-container {
     position: absolute;
-    top: 20%;
-    width: 100%;
+    width: 80%;
+    max-width: 600px;
     text-align: center;
     z-index: 50;
-    padding: 0 20px;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.lyric-pos-left {
+    top: 20%;
+    left: 5%;
+    transform: rotate(-10deg);
+}
+
+.lyric-pos-right {
+    top: 60%;
+    right: 5%;
+    transform: rotate(10deg);
+}
+
+.lyric-pos-center {
+    top: 40%;
+    left: 50%;
+    transform: translateX(-50%) rotate(0deg);
 }
 
 #lyrics {
-    font-size: 3.5rem;
-    text-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+    font-size: 2.2rem;
+    font-family: 'Press Start 2P', cursive;
+    text-shadow: 5px 5px 0px #000, -3px -3px 0px #ff00ff;
     display: inline-block;
-    color: #fffb00;
-    text-transform: uppercase;
+    color: #00ffff;
+    line-height: 1.6;
 }
 
 .lyric-animate {
-    animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
 @keyframes popIn {
-    0% { transform: scale(0) rotate(-10deg); opacity: 0; }
-    50% { transform: scale(1.1) rotate(5deg); opacity: 1; }
-    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    0% { transform: scale(0); opacity: 0; }
+    50% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
 }
 
-/* CATS */
+/* ANIMATED CAT GIFS */
 .cat {
     position: absolute;
-    font-size: 5rem;
-    text-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    width: 150px;
+    image-rendering: pixelated; /* enhances pixel look */
+    filter: drop-shadow(5px 5px 0px rgba(0,0,0,0.5));
     animation-timing-function: ease-in-out;
     animation-iteration-count: infinite;
 }
 
-/* Individual cat animations */
-.cat-1 { top: 10%; left: 10%; animation: floatLeft 3s infinite alternate; }
-.cat-2 { top: 70%; left: 80%; animation: floatRight 4s infinite alternate; font-size: 6rem; }
-.cat-3 { top: 40%; left: 20%; animation: spinJelly 5s infinite; }
-.cat-4 { top: 15%; left: 75%; animation: floatLeft 3.5s infinite alternate-reverse; }
-.cat-5 { top: 60%; left: 30%; animation: bobble 2s infinite; font-size: 7rem; }
-.cat-6 { top: 80%; left: 15%; animation: floatRight 4.5s infinite alternate; }
-.cat-7 { top: 30%; left: 85%; animation: floatLeft 4s infinite alternate; }
-.cat-8 { top: 5%; left: 50%; animation: bobble 2.5s infinite alternate-reverse; font-size: 4rem; }
-.cat-9 { top: 75%; left: 50%; animation: spinJelly 6s infinite reverse; }
-.cat-10 { top: 45%; left: 60%; animation: floatRight 3.2s infinite alternate; font-size: 8rem; }
+.cat-1 { top: 10%; left: 10%; width: 120px; animation: floatLeft 3s infinite alternate; }
+.cat-2 { top: 70%; left: 75%; width: 100px; animation: floatRight 4s infinite alternate; }
+.cat-3 { top: 35%; left: 20%; width: 180px; animation: spinJelly 5s infinite; }
+.cat-4 { top: 15%; left: 70%; width: 140px; animation: bobble 2.5s infinite alternate-reverse; }
+.cat-5 { top: 60%; left: 10%; width: 110px; animation: floatLeft 3.5s infinite alternate; }
+.cat-6 { top: 80%; left: 40%; width: 130px; animation: bobble 2s infinite; }
+.cat-7 { top: 5%; left: 40%; width: 200px; animation: floatRight 4.5s infinite alternate-reverse; }
 
 @keyframes floatLeft {
-    0% { transform: translate(0, 0) rotate(0deg); }
-    100% { transform: translate(30px, -30px) rotate(-15deg); }
+    0% { transform: translate(0, 0) scaleX(1); }
+    100% { transform: translate(30px, -30px) scaleX(1); }
 }
 
 @keyframes floatRight {
-    0% { transform: translate(0, 0) rotate(0deg); }
-    100% { transform: translate(-30px, 30px) rotate(15deg); }
+    0% { transform: translate(0, 0) scaleX(-1); }
+    100% { transform: translate(-30px, 30px) scaleX(-1); }
 }
 
 @keyframes spinJelly {
     0% { transform: scale(1) rotate(0deg); }
-    25% { transform: scale(1.2, 0.8) rotate(90deg); }
-    50% { transform: scale(0.8, 1.2) rotate(180deg); }
-    75% { transform: scale(1.2, 0.8) rotate(270deg); }
-    100% { transform: scale(1) rotate(360deg); }
+    50% { transform: scale(1.2) rotate(10deg); }
+    100% { transform: scale(1) rotate(-10deg); }
 }
 
 @keyframes bobble {
@@ -144,7 +166,8 @@ body {
 }
 
 @media (max-width: 600px) {
-    #start-screen h1 { font-size: 2.5rem; }
-    #lyrics { font-size: 2.5rem; }
-    .cat { font-size: 3.5rem !important; }
+    #start-screen h1 { font-size: 1.5rem; }
+    #lyrics { font-size: 1.2rem; }
+    .cat { width: 80px !important; }
+    .cat-3, .cat-7 { width: 120px !important; }
 }
