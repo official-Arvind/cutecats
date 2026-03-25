@@ -85,19 +85,21 @@ body {
     width: 80%;
     max-width: 600px;
     text-align: center;
-    z-index: 50;
+    z-index: 9999;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .lyric-pos-left {
     top: 20%;
     left: 5%;
+    right: auto;
     transform: rotate(-10deg);
 }
 
 .lyric-pos-right {
     top: 60%;
     right: 5%;
+    left: auto;
     transform: rotate(10deg);
 }
 

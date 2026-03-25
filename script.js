@@ -1,4 +1,6 @@
 let ytPlayer;
+let playerHasStarted = false;
+let lyricsInterval = null;
 
 // 1. Load the YouTube IFrame Player API code asynchronously.
 var tag = document.createElement('script');
@@ -10,8 +12,7 @@ if (firstScriptTag) {
     document.head.appendChild(tag);
 }
 
-// 2. This function creates an <iframe> (and YouTube player)
-//    after the API code downloads.
+// 2. This function creates an <iframe> (and YouTube player) after the API code downloads.
 window.onYouTubeIframeAPIReady = function() {
     ytPlayer = new YT.Player('youtube-player', {
         height: '10', 
@@ -25,7 +26,8 @@ window.onYouTubeIframeAPIReady = function() {
             'autoplay': 0
         },
         events: {
-            'onReady': onPlayerReady
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange
         }
     });
 };
@@ -33,6 +35,14 @@ window.onYouTubeIframeAPIReady = function() {
 function onPlayerReady(event) {
     document.getElementById('start-btn').innerText = 'Let\'s Go! 😺';
     document.getElementById('start-btn').disabled = false;
+}
+
+function onPlayerStateChange(event) {
+    // If state is PLAYING (1) and we haven't started lyrics yet
+    if (event.data === 1 && !playerHasStarted) {
+        playerHasStarted = true;
+        startLyrics();
+    }
 }
 
 // Disable button until player is ready
@@ -56,13 +66,23 @@ startBtn.addEventListener('click', function() {
     const mainContent = document.getElementById('main-content');
     mainContent.classList.remove('hidden');
 
+    startCats();
+
     // Play YouTube video
     if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
         ytPlayer.playVideo();
+        // Fallback for starting lyrics in case YouTube plays but API doesn't notify
+        setTimeout(() => {
+            if (!playerHasStarted) {
+                playerHasStarted = true;
+                startLyrics();
+            }
+        }, 2000);
+    } else {
+        // Offline or YT failed
+        playerHasStarted = true;
+        startLyrics();
     }
-
-    startLyrics();
-    startCats();
 });
 
 const lyricsData = [
@@ -77,6 +97,10 @@ const lyricsData = [
 ];
 
 function startLyrics() {
+    if (lyricsInterval !== null) {
+        return; // already started
+    }
+
     const lyricsContainer = document.getElementById('lyrics-container');
     const lyricsEl = document.getElementById('lyrics');
     let isLeft = true;
@@ -86,9 +110,10 @@ function startLyrics() {
     function playLoop() {
         lyricsData.forEach((lyric) => {
             setTimeout(() => {
-                // Reset animation
-                lyricsEl.classList.remove('lyric-animate');
-                void lyricsEl.offsetWidth; // trigger reflow
+                // Foolproof CSS animation restart
+                lyricsEl.style.animation = 'none';
+                lyricsEl.offsetHeight; // trigger reflow
+                lyricsEl.style.animation = null;
                 
                 // Update text
                 lyricsEl.innerText = lyric.text;
@@ -112,7 +137,7 @@ function startLyrics() {
     }
 
     playLoop();
-    setInterval(playLoop, loopDuration);
+    lyricsInterval = setInterval(playLoop, loopDuration);
 }
 
 function startCats() {
