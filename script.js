@@ -1,6 +1,7 @@
 let ytPlayer;
 let playerHasStarted = false;
 let lyricsInterval = null;
+let currentLyricIndex = -1;
 
 // 1. Load the YouTube IFrame Player API code asynchronously.
 var tag = document.createElement('script');
@@ -100,6 +101,8 @@ const lyricsData = [
     { time: 34000, text: "👂 Abe Bol Rahe Ho Na Kya Tera Kaan Kharab!" }
 ];
 
+
+
 function startLyrics() {
     if (lyricsInterval !== null) {
         return; // already started
@@ -108,19 +111,33 @@ function startLyrics() {
     const lyricsContainer = document.getElementById('lyrics-container');
     const lyricsEl = document.getElementById('lyrics');
     let isLeft = true;
-    
-    const loopDuration = lyricsData[lyricsData.length - 1].time + 3000;
 
-    function playLoop() {
-        lyricsData.forEach((lyric) => {
-            setTimeout(() => {
+    // Advanced Sync Engine: Polls the YouTube API internal clock directly
+    // This provides "Metrolist" / Spotify level perfect syncing even if buffering
+    function checkLyricsSync() {
+        if (ytPlayer && typeof ytPlayer.getCurrentTime === 'function') {
+            const timeMs = ytPlayer.getCurrentTime() * 1000;
+            
+            let foundIndex = -1;
+            for (let i = 0; i < lyricsData.length; i++) {
+                if (timeMs >= lyricsData[i].time) {
+                    foundIndex = i;
+                } else {
+                    break;
+                }
+            }
+            
+            // Loop functionality: If time passes the end, we don't do anything because the song keeps playing.
+            if (foundIndex !== -1 && foundIndex !== currentLyricIndex) {
+                currentLyricIndex = foundIndex;
+                
                 // Foolproof CSS animation restart
                 lyricsEl.style.animation = 'none';
                 lyricsEl.offsetHeight; // trigger reflow
                 lyricsEl.style.animation = null;
                 
                 // Update text
-                lyricsEl.innerText = lyric.text;
+                lyricsEl.innerText = lyricsData[foundIndex].text;
                 
                 // Toggle position left/right
                 if (isLeft) {
@@ -130,18 +147,19 @@ function startLyrics() {
                 }
                 isLeft = !isLeft;
 
-                // Color switch
+                // Funky Color switch
                 const colors = ['#fffb00', '#00ffff', '#ff00ff', '#ffffff', '#ff9900', '#00ffcc'];
                 lyricsEl.style.color = colors[Math.floor(Math.random() * colors.length)];
                 
                 // Trigger pop animation
                 lyricsEl.classList.add('lyric-animate');
-            }, lyric.time);
-        });
+            }
+        }
+        lyricsInterval = requestAnimationFrame(checkLyricsSync);
     }
 
-    playLoop();
-    lyricsInterval = setInterval(playLoop, loopDuration);
+    // Start the sync engine
+    checkLyricsSync();
 }
 
 function startCats() {
