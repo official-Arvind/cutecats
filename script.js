@@ -1,12 +1,22 @@
 let ytPlayer;
 
-// This function creates an <iframe> (and YouTube player)
-// after the API code downloads.
-function onYouTubeIframeAPIReady() {
+// 1. Load the YouTube IFrame Player API code asynchronously.
+var tag = document.createElement('script');
+tag.src = "https://www.youtube.com/iframe_api";
+var firstScriptTag = document.getElementsByTagName('script')[0];
+if (firstScriptTag) {
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+} else {
+    document.head.appendChild(tag);
+}
+
+// 2. This function creates an <iframe> (and YouTube player)
+//    after the API code downloads.
+window.onYouTubeIframeAPIReady = function() {
     ytPlayer = new YT.Player('youtube-player', {
-        height: '10', // hide it
+        height: '10', 
         width: '10',
-        videoId: 'UalZ-cPzxk4', // Podcast from Bali
+        videoId: 'UalZ-cPzxk4', 
         playerVars: {
             'playsinline': 1,
             'controls': 0,
@@ -18,7 +28,7 @@ function onYouTubeIframeAPIReady() {
             'onReady': onPlayerReady
         }
     });
-}
+};
 
 function onPlayerReady(event) {
     document.getElementById('start-btn').innerText = 'Let\'s Go! 😺';
@@ -26,10 +36,19 @@ function onPlayerReady(event) {
 }
 
 // Disable button until player is ready
-document.getElementById('start-btn').disabled = true;
-document.getElementById('start-btn').innerText = 'Loading vibes...';
+const startBtn = document.getElementById('start-btn');
+startBtn.disabled = true;
+startBtn.innerText = 'Loading vibes...';
 
-document.getElementById('start-btn').addEventListener('click', function() {
+// Fallback just in case YouTube takes too long or fails
+setTimeout(() => {
+    if (startBtn.disabled) {
+        startBtn.innerText = 'Let\'s Go! (Fallback) 😺';
+        startBtn.disabled = false;
+    }
+}, 4000);
+
+startBtn.addEventListener('click', function() {
     // Hide start screen
     document.getElementById('start-screen').classList.add('hidden');
     
